@@ -52,8 +52,8 @@ func settingsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func client() {
-	sleepT := time.Millisecond * time.Duration(60000/settings.ReqsPerMinute)
 	for {
+		sleepT := time.Millisecond * time.Duration(60000/settings.ReqsPerMinute)
 		time.Sleep(sleepT)
 		r, err := http.Get("http://localhost:8000/")
 		if err == nil {
