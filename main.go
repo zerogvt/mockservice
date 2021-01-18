@@ -6,11 +6,14 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
+
+	"github.com/newrelic/go-agent/v3/newrelic"
 )
 
-// Settings is our
+// Settings are our operational parameters
 type Settings struct {
 	ErrorRate     int `json:"err"`
 	ReqsPerMinute int `json:"rpm"`
@@ -65,7 +68,14 @@ func client() {
 }
 
 func main() {
-	http.HandleFunc("/", rootHandler)
+	app, err := newrelic.NewApplication(
+		newrelic.ConfigAppName("mockservice_go"),
+		newrelic.ConfigLicense(os.Getenv("NEW_RELIC_LICENSE_KEY")),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	http.HandleFunc(newrelic.WrapHandleFunc(app, "/", rootHandler))
 	http.HandleFunc("/set/", settingsHandler)
 	go client()
 	log.Fatal(http.ListenAndServe(":8000", nil))
