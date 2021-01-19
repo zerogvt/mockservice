@@ -21,7 +21,7 @@ type Settings struct {
 
 var defSet = Settings{
 	ErrorRate:     10,
-	ReqsPerMinute: 600}
+	ReqsPerMinute: 30}
 
 var settings *Settings
 
@@ -67,7 +67,8 @@ func client() {
 	}
 }
 
-func main() {
+// Routes sets our public endpoints
+func Routes() {
 	app, err := newrelic.NewApplication(
 		newrelic.ConfigAppName("mockservice_go"),
 		newrelic.ConfigLicense(os.Getenv("NEW_RELIC_LICENSE_KEY")),
@@ -77,6 +78,10 @@ func main() {
 	}
 	http.HandleFunc(newrelic.WrapHandleFunc(app, "/", rootHandler))
 	http.HandleFunc("/set/", settingsHandler)
+}
+
+func main() {
+	Routes()
 	go client()
 	log.Fatal(http.ListenAndServe(":8000", nil))
 }
